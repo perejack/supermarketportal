@@ -52,7 +52,7 @@ export default function ContractPage() {
       fullName: user.fullName,
       staffNumber: user.staffNumber,
       position: user.position,
-      amount: onb.paymentAmount ?? 950,
+      amount: onb.paymentAmount ?? 650,
       paymentRef: onb.paymentRef,
       paymentPhone: onb.paymentPhone ?? "",
       paidAt: onb.paymentAt,
@@ -168,7 +168,7 @@ export default function ContractPage() {
                 <div className="truncate text-sm text-muted-foreground">
                   {paid ? (
                     <>
-                      Ref <span className="font-mono">{onb.paymentRef}</span> · KES {onb.paymentAmount ?? 950}
+                      Ref <span className="font-mono">{onb.paymentRef}</span> · KES {onb.paymentAmount ?? 650}
                     </>
                   ) : (
                     "Available right after payment."

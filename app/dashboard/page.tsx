@@ -42,7 +42,7 @@ export default function DashboardPage() {
     { key: "locker", label: "Locker Key", icon: KeyRound, done: !!onb.lockerRequested, to: "/onboarding/locker" as const },
     { key: "training", label: "Training Materials", icon: BookOpen, done: !!(onb.trainingAccepted && onb.trainingReviewed), to: "/onboarding/training" as const },
     { key: "id", label: "National ID Upload", icon: ScanLine, done: !!(onb.idFrontDataUrl && onb.idBackDataUrl), to: "/onboarding/id" as const },
-    { key: "payment", label: "Item Purchase Processing Fee (KES 950)", icon: CreditCard, done: !!onb.paymentCompleted, to: "/onboarding/payment" as const },
+    { key: "payment", label: "Item Purchase Processing Fee (KES 650)", icon: CreditCard, done: !!onb.paymentCompleted, to: "/onboarding/payment" as const },
     { key: "contract", label: "Employment Contract", icon: FileSignature, done: !!onb.contractDownloaded, to: "/onboarding/contract" as const },
   ];
   const completed = tasks.filter((t) => t.done).length;
@@ -168,7 +168,7 @@ export default function DashboardPage() {
                     Download your personalized {b.logoText} employment contract. Print it, sign it, and bring a copy plus your National ID to orientation.
                   </>
                 ) : (
-                  <>Complete the KES 950 item purchase processing fee first — it unlocks your branded contract and official application receipt.</>
+                  <>Complete the KES 650 item purchase processing fee first — it unlocks your branded contract and official application receipt.</>
                 )}
               </p>
             </div>
