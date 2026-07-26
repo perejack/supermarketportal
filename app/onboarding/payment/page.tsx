@@ -115,7 +115,7 @@ export default function PaymentPage() {
 
         const status = await MpesaService.getPaymentStatus(init.checkoutRequestId);
         if (status.status === "completed") {
-          // Prefer PayHero receipt; fall back to a friendly ref.
+          // Prefer Makamesco receipt; fall back to a friendly ref.
           const ref = status.receipt ?? "MP" + Date.now().toString().slice(-8).toUpperCase();
           patch({
             paymentCompleted: true,

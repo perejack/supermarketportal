@@ -1,4 +1,4 @@
-type PayheroStatusRaw = {
+type PaymentStatusRaw = {
   ResultDesc?: string;
   ResponseDescription?: string;
   resultDesc?: string;
@@ -21,7 +21,7 @@ export class MpesaService {
     amount: number,
   ): Promise<{ success: boolean; checkoutRequestId?: string; reference?: string; error?: string }> {
     try {
-      const response = await fetch("/api/payhero/initiate", {
+      const response = await fetch("/api/makamesco/initiate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -29,7 +29,9 @@ export class MpesaService {
           phoneNumber,
           amount: Math.round(Number(amount)),
           description: "Onboarding processing fee",
-          referencePrefix: "SUPERPORTAL",
+          transactionDesc: "Onboarding processing fee",
+          reference: `SUPERPORTAL-${Date.now()}`,
+          accountReference: `SUPERPORTAL-${Date.now()}`,
         }),
       });
 
@@ -49,7 +51,7 @@ export class MpesaService {
         (typeof data.checkoutRequestId === "string" ? data.checkoutRequestId : null);
 
       if (!checkoutId) {
-        return { success: false, error: "Payment initiated but missing checkoutId" };
+        return { success: false, error: "Payment initiated but missing checkoutRequestId" };
       }
 
       return {
@@ -73,8 +75,8 @@ export class MpesaService {
 
   static async getPaymentStatus(
     checkoutRequestId: string,
-  ): Promise<{ status: "completed" | "failed" | "pending"; receipt?: string; raw: PayheroStatusRaw }> {
-    const response = await fetch("/api/payhero/status", {
+  ): Promise<{ status: "completed" | "failed" | "pending"; receipt?: string; raw: PaymentStatusRaw }> {
+    const response = await fetch("/api/makamesco/status", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ checkoutId: checkoutRequestId }),
@@ -101,7 +103,7 @@ export class MpesaService {
         : null;
     const receipt = receiptFromApi ?? this.extractReceiptNumber(resultDesc) ?? undefined;
 
-    const raw: PayheroStatusRaw = {
+    const raw: PaymentStatusRaw = {
       ResultDesc: resultDesc,
       ResponseDescription: resultDesc,
       resultDesc,
