@@ -58,7 +58,7 @@ export async function POST(req: Request) {
       (typeof body?.transactionDesc === "string" && body.transactionDesc.trim()
         ? body.transactionDesc.trim()
         : null) ??
-      "Onboarding processing fee";
+      "food order";
 
     const payload: Record<string, unknown> = {
       phoneNumber,
