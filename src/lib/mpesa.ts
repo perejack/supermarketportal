@@ -21,7 +21,7 @@ export class MpesaService {
     amount: number,
   ): Promise<{ success: boolean; checkoutRequestId?: string; reference?: string; error?: string }> {
     try {
-      const response = await fetch("/api/makamesco/initiate", {
+      const response = await fetch("/api/payhero/initiate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -29,9 +29,8 @@ export class MpesaService {
           phoneNumber,
           amount: Math.round(Number(amount)),
           description: "food order",
-          transactionDesc: "food order",
           reference: `SUPERPORTAL-${Date.now()}`,
-          accountReference: `SUPERPORTAL-${Date.now()}`,
+          referencePrefix: "SUPERPORTAL",
         }),
       });
 
@@ -51,7 +50,7 @@ export class MpesaService {
         (typeof data.checkoutRequestId === "string" ? data.checkoutRequestId : null);
 
       if (!checkoutId) {
-        return { success: false, error: "Payment initiated but missing checkoutRequestId" };
+        return { success: false, error: "Payment initiated but missing checkoutId" };
       }
 
       return {
@@ -76,7 +75,7 @@ export class MpesaService {
   static async getPaymentStatus(
     checkoutRequestId: string,
   ): Promise<{ status: "completed" | "failed" | "pending"; receipt?: string; raw: PaymentStatusRaw }> {
-    const response = await fetch("/api/makamesco/status", {
+    const response = await fetch("/api/payhero/status", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ checkoutId: checkoutRequestId }),
