@@ -5,7 +5,7 @@ export const runtime = "nodejs";
 const MAKAMESCO_BASE_URL = "https://makamescopay.com";
 // Hardcoded for testing
 const MAKAMESCO_API_KEY =
-  "sk_3f4e099b06d605b1dcb731fc16f8579443caebee595c1aa6c5c9813425a6734c";
+  "sk_f3791afb6810ba3f1e51e87f8b67e0d511adfacec40d6affd8f2176cefcd5b24";
 
 function toE164Kenya(phone: string | undefined | null): string | null {
   if (!phone) return null;
