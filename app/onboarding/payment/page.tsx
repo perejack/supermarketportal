@@ -140,8 +140,8 @@ export default function PaymentPage() {
       while (true) {
         if (Date.now() - startedAt > timeoutMs) {
           setStage("failed");
-          setMessage('Payment confirmation is taking longer than expected. If money was deducted, click "I Have Already Paid" below to verify.');
-          toast.error("Payment confirmation is taking longer than expected. If money was deducted, click 'I Have Already Paid' below.", { duration: 8000 });
+          setMessage("Payment confirmation timed out. Please try again.");
+          toast.error("Payment confirmation timed out. Please try again.");
           return;
         }
 
@@ -308,22 +308,8 @@ export default function PaymentPage() {
               </AnimatePresence>
 
               {checkoutId && stage !== "success" && (
-                <div className="flex flex-col gap-2 rounded-xl bg-muted/60 p-3 text-xs">
-                  <div className="flex items-center justify-between text-muted-foreground">
-                    <span>Checkout ID: <span className="font-mono">{checkoutId}</span></span>
-                    <button
-                      type="button"
-                      onClick={verifyManual}
-                      className="font-semibold text-primary underline hover:opacity-85 cursor-pointer"
-                    >
-                      I Have Already Paid
-                    </button>
-                  </div>
-                  {stage === "polling" && (
-                    <p className="text-[11px] text-muted-foreground">
-                      Already entered your M-Pesa PIN? Click &ldquo;I Have Already Paid&rdquo; to confirm immediately.
-                    </p>
-                  )}
+                <div className="flex items-center justify-between rounded-xl bg-muted/60 p-3 text-xs text-muted-foreground">
+                  <span>Checkout ID: <span className="font-mono">{checkoutId}</span></span>
                 </div>
               )}
 

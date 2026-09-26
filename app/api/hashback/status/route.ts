@@ -24,18 +24,21 @@ function mapHashbackStatus(data: Record<string, unknown>): "paid" | "failed" | "
     return "paid";
   }
 
-  // ── Explicit failure — only flag as failed when the description is conclusive
+  // ── Explicit failure — only flag as failed when explicitly cancelled, wrong PIN, or insufficient funds.
+  // CRITICAL: Code 1037 ("DS timeout user cannot be reached.") is returned by HashBack IMMEDIATELY
+  // while the phone prompt is ringing / waiting for PIN entry. It MUST NOT be treated as a failure!
+  if (resultCode === "1037" || resultDesc.includes("user cannot be reached") || resultDesc.includes("ds timeout")) {
+    return "pending";
+  }
+
   const isConclusiveFailure =
-    resultDesc.includes("cancel") ||
+    resultCode === "1032" ||
+    resultDesc.includes("cancelled by user") ||
+    resultDesc.includes("canceled by user") ||
+    resultDesc.includes("request cancelled") ||
     resultDesc.includes("insufficient") ||
-    resultDesc.includes("declined") ||
     resultDesc.includes("wrong pin") ||
     resultDesc.includes("invalid pin") ||
-    resultDesc.includes("user cannot be reached") ||
-    resultDesc.includes("timed out") ||
-    resultDesc.includes("timeout") ||
-    resultDesc.includes("failed") ||
-    status === "failed" ||
     status === "cancelled" ||
     status === "canceled";
 

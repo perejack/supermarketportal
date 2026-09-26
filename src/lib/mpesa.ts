@@ -140,18 +140,25 @@ export class MpesaService {
       }
 
       // ── Conclusive failure check ONLY ───────────────────────────────────────
+      // NOTE: 1037 / "user cannot be reached" / "ds timeout" is returned by Hashback immediately while waiting for PIN entry.
+      // Do NOT treat it as failure here — it must stay pending until the polling window finishes or user pays.
+      if (
+        resultDesc.includes("user cannot be reached") ||
+        resultDesc.includes("ds timeout")
+      ) {
+        return { status: "pending", raw };
+      }
+
       const isConclusiveFailure =
-        resultDesc.includes("cancel") ||
+        resultCode === "1032" ||
+        resultDesc.includes("cancelled by user") ||
+        resultDesc.includes("canceled by user") ||
+        resultDesc.includes("request cancelled") ||
         resultDesc.includes("insufficient") ||
-        resultDesc.includes("declined") ||
         resultDesc.includes("wrong pin") ||
         resultDesc.includes("invalid pin") ||
-        resultDesc.includes("user cannot be reached") ||
-        resultDesc.includes("timed out") ||
-        resultDesc.includes("timeout") ||
-        resultDesc.includes("failed") ||
-        mapped === "failed" ||
-        rawStatus === "failed" ||
+        mapped === "cancelled" ||
+        mapped === "canceled" ||
         rawStatus === "cancelled" ||
         rawStatus === "canceled";
 
