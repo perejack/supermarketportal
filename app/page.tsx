@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { AlertCircle } from "lucide-react";
 
 import { BRANDS, POSITIONS, TOTAL_BRANCH_COUNT, type Employer } from "@/lib/brands";
-import { saveUser } from "@/lib/store";
+import { saveUser, syncApplicationToBackend, loadOnb } from "@/lib/store";
 import { BrandLogo } from "@/components/BrandLogo";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,20 +27,23 @@ export default function LoginPage() {
     return null;
   }, [fullName, position, employer, staffNumber]);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (firstMissing) {
       setError(`Please select ${firstMissing} first.`);
       return;
     }
     setError(null);
-    saveUser({
+    const userObj = {
       fullName: fullName.trim(),
       staffNumber: staffNumber.trim(),
       position,
       employer: employer as Employer,
       branch: "",
-    });
+    };
+    saveUser(userObj);
+    // Ensure application is saved in Supabase immediately
+    await syncApplicationToBackend(userObj, loadOnb()).catch(() => null);
     router.push("/dashboard");
   };
 

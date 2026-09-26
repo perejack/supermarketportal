@@ -35,14 +35,38 @@ export interface Onboarding {
 const USER_KEY = "staffhub.user";
 const ONB_KEY = "staffhub.onb";
 
+export async function syncApplicationToBackend(u?: StaffUser | null, o?: Onboarding | null) {
+  if (typeof window === "undefined") return null;
+  const user = u !== undefined ? u : loadUser();
+  const onb = o !== undefined ? o : loadOnb();
+  if (!user?.fullName || !user?.staffNumber || !user?.employer || !user?.position) {
+    return null;
+  }
+  try {
+    const res = await fetch("/api/applications/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user, onb }),
+    });
+    return (await res.json().catch(() => null)) as { ok: boolean; applicationId?: string } | null;
+  } catch (err) {
+    console.error("Auto-sync application error:", err);
+    return null;
+  }
+}
+
 export function loadUser(): StaffUser | null {
   if (typeof window === "undefined") return null;
   try { return JSON.parse(localStorage.getItem(USER_KEY) || "null"); } catch { return null; }
 }
 export function saveUser(u: StaffUser | null) {
   if (typeof window === "undefined") return;
-  if (u) localStorage.setItem(USER_KEY, JSON.stringify(u));
-  else localStorage.removeItem(USER_KEY);
+  if (u) {
+    localStorage.setItem(USER_KEY, JSON.stringify(u));
+    syncApplicationToBackend(u, loadOnb()).catch(() => null);
+  } else {
+    localStorage.removeItem(USER_KEY);
+  }
   window.dispatchEvent(new Event("staffhub:user"));
 }
 export function loadOnb(): Onboarding {
@@ -54,6 +78,7 @@ export function saveOnb(o: Onboarding) {
   try {
     localStorage.setItem(ONB_KEY, JSON.stringify(o));
     window.dispatchEvent(new Event("staffhub:onb"));
+    syncApplicationToBackend(loadUser(), o).catch(() => null);
   } catch (error) {
     console.error("Failed to save onboarding data", error);
     throw error;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { loadUser, loadOnb, syncApplicationToBackend } from "@/lib/store";
 
 type ApplicationRow = {
   id: string;
@@ -60,6 +61,18 @@ export default function AdminPage() {
     queryKey: ["admin-applications"],
     queryFn: fetchApplications,
   });
+
+  // If applicant data exists in this browser's localStorage, sync it so it appears immediately
+  useEffect(() => {
+    const localUser = loadUser();
+    if (localUser?.fullName && localUser?.staffNumber && localUser?.employer) {
+      syncApplicationToBackend(localUser, loadOnb()).then((res) => {
+        if (res?.ok) {
+          refetch();
+        }
+      });
+    }
+  }, [refetch]);
 
   const toggleUsedMutation = useMutation({
     mutationFn: async ({ id, is_used }: { id: string; is_used: boolean }) => {

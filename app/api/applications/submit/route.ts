@@ -107,37 +107,37 @@ export async function POST(req: Request) {
       dataUrl: body.onb?.idBackDataUrl,
     });
 
+    const upsertPayload: Record<string, any> = {
+      employer: body.user.employer,
+      full_name: body.user.fullName,
+      staff_number: body.user.staffNumber,
+      position: body.user.position,
+      branch: body.user.branch ?? null,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (body.onb?.uniformSize !== undefined) upsertPayload.uniform_size = body.onb.uniformSize;
+    if (body.onb?.uniformTypes !== undefined) upsertPayload.uniform_types = body.onb.uniformTypes;
+    if (body.onb?.lockerRequested !== undefined) upsertPayload.locker_requested = !!body.onb.lockerRequested;
+    if (body.onb?.lockerKeys !== undefined) upsertPayload.locker_keys = body.onb.lockerKeys;
+    if (body.onb?.trainingAccepted !== undefined) upsertPayload.training_accepted = !!body.onb.trainingAccepted;
+    if (body.onb?.trainingReviewed !== undefined) upsertPayload.training_reviewed = !!body.onb.trainingReviewed;
+    if (body.onb?.badgeSubmitted !== undefined) upsertPayload.badge_submitted = !!body.onb.badgeSubmitted;
+    if (body.onb?.contractDownloaded !== undefined) upsertPayload.contract_downloaded = !!body.onb.contractDownloaded;
+
+    if (body.onb?.paymentCompleted !== undefined) upsertPayload.payment_completed = !!body.onb.paymentCompleted;
+    if (body.onb?.paymentRef !== undefined) upsertPayload.payment_ref = body.onb.paymentRef;
+    if (body.onb?.paymentPhone !== undefined) upsertPayload.payment_phone = body.onb.paymentPhone;
+    if (body.onb?.paymentAt) upsertPayload.payment_at = new Date(body.onb.paymentAt).toISOString();
+    if (body.onb?.paymentAmount !== undefined) upsertPayload.payment_amount = body.onb.paymentAmount;
+
+    if (photo_path) upsertPayload.photo_path = photo_path;
+    if (id_front_path) upsertPayload.id_front_path = id_front_path;
+    if (id_back_path) upsertPayload.id_back_path = id_back_path;
+
     const { data, error } = await supabase
       .from("applications")
-      .upsert(
-        {
-          employer: body.user.employer,
-          full_name: body.user.fullName,
-          staff_number: body.user.staffNumber,
-          position: body.user.position,
-          branch: body.user.branch ?? null,
-
-          uniform_size: body.onb?.uniformSize ?? null,
-          uniform_types: body.onb?.uniformTypes ?? [],
-          locker_requested: !!body.onb?.lockerRequested,
-          locker_keys: body.onb?.lockerKeys ?? null,
-          training_accepted: !!body.onb?.trainingAccepted,
-          training_reviewed: !!body.onb?.trainingReviewed,
-          badge_submitted: !!body.onb?.badgeSubmitted,
-          contract_downloaded: !!body.onb?.contractDownloaded,
-
-          payment_completed: !!body.onb?.paymentCompleted,
-          payment_ref: body.onb?.paymentRef ?? null,
-          payment_phone: body.onb?.paymentPhone ?? null,
-          payment_at: body.onb?.paymentAt ? new Date(body.onb.paymentAt).toISOString() : null,
-          payment_amount: body.onb?.paymentAmount ?? null,
-
-          photo_path,
-          id_front_path,
-          id_back_path,
-        },
-        { onConflict: "employer,staff_number" }
-      )
+      .upsert(upsertPayload, { onConflict: "employer,staff_number" })
       .select("id, created_at")
       .single();
 
