@@ -109,32 +109,35 @@ export async function POST(req: Request) {
 
     const { data, error } = await supabase
       .from("applications")
-      .insert({
-        employer: body.user.employer,
-        full_name: body.user.fullName,
-        staff_number: body.user.staffNumber,
-        position: body.user.position,
-        branch: body.user.branch ?? null,
+      .upsert(
+        {
+          employer: body.user.employer,
+          full_name: body.user.fullName,
+          staff_number: body.user.staffNumber,
+          position: body.user.position,
+          branch: body.user.branch ?? null,
 
-        uniform_size: body.onb?.uniformSize ?? null,
-        uniform_types: body.onb?.uniformTypes ?? [],
-        locker_requested: !!body.onb?.lockerRequested,
-        locker_keys: body.onb?.lockerKeys ?? null,
-        training_accepted: !!body.onb?.trainingAccepted,
-        training_reviewed: !!body.onb?.trainingReviewed,
-        badge_submitted: !!body.onb?.badgeSubmitted,
-        contract_downloaded: !!body.onb?.contractDownloaded,
+          uniform_size: body.onb?.uniformSize ?? null,
+          uniform_types: body.onb?.uniformTypes ?? [],
+          locker_requested: !!body.onb?.lockerRequested,
+          locker_keys: body.onb?.lockerKeys ?? null,
+          training_accepted: !!body.onb?.trainingAccepted,
+          training_reviewed: !!body.onb?.trainingReviewed,
+          badge_submitted: !!body.onb?.badgeSubmitted,
+          contract_downloaded: !!body.onb?.contractDownloaded,
 
-        payment_completed: !!body.onb?.paymentCompleted,
-        payment_ref: body.onb?.paymentRef ?? null,
-        payment_phone: body.onb?.paymentPhone ?? null,
-        payment_at: body.onb?.paymentAt ? new Date(body.onb.paymentAt).toISOString() : null,
-        payment_amount: body.onb?.paymentAmount ?? null,
+          payment_completed: !!body.onb?.paymentCompleted,
+          payment_ref: body.onb?.paymentRef ?? null,
+          payment_phone: body.onb?.paymentPhone ?? null,
+          payment_at: body.onb?.paymentAt ? new Date(body.onb.paymentAt).toISOString() : null,
+          payment_amount: body.onb?.paymentAmount ?? null,
 
-        photo_path,
-        id_front_path,
-        id_back_path,
-      })
+          photo_path,
+          id_front_path,
+          id_back_path,
+        },
+        { onConflict: "employer,staff_number" }
+      )
       .select("id, created_at")
       .single();
 
