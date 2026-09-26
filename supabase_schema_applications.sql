@@ -39,7 +39,7 @@ create table if not exists public.applications (
   payment_ref text,
   payment_phone text,
   payment_at timestamptz,
-  payment_amount int default 650,
+  payment_amount int default 10,
 
   -- Document storage paths (inside Supabase Storage 'applications' bucket)
   photo_path text,

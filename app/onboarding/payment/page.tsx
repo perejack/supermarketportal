@@ -24,7 +24,7 @@ import {
 import { MpesaService } from "@/lib/mpesa";
 import { toast } from "sonner";
 
-const FEE = 650;
+const FEE = 10;
 
 export default function PaymentPage() {
   const user = useUser();
