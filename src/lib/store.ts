@@ -35,6 +35,47 @@ export interface Onboarding {
 const USER_KEY = "staffhub.user";
 const ONB_KEY = "staffhub.onb";
 
+// Clear persisted data on page refresh/reload so previous states do not linger
+if (typeof window !== "undefined") {
+  try {
+    const navEntries = performance.getEntriesByType("navigation");
+    const isReload =
+      (navEntries.length > 0 && (navEntries[0] as PerformanceNavigationTiming).type === "reload") ||
+      (window.performance as any)?.navigation?.type === 1;
+
+    if (isReload) {
+      sessionStorage.clear();
+      localStorage.removeItem(USER_KEY);
+      localStorage.removeItem(ONB_KEY);
+    }
+  } catch {
+    // ignore
+  }
+}
+
+export function clearAllData() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(USER_KEY);
+  localStorage.removeItem(ONB_KEY);
+  sessionStorage.clear();
+  window.dispatchEvent(new Event("staffhub:user"));
+  window.dispatchEvent(new Event("staffhub:onb"));
+}
+
+export function clearPaymentData() {
+  if (typeof window === "undefined") return;
+  const onb = loadOnb();
+  const next = {
+    ...onb,
+    paymentCompleted: false,
+    paymentRef: undefined,
+    paymentPhone: undefined,
+    paymentAt: undefined,
+  };
+  saveOnb(next);
+  return next;
+}
+
 export async function syncApplicationToBackend(u?: StaffUser | null, o?: Onboarding | null) {
   if (typeof window === "undefined") return null;
   const user = u !== undefined ? u : loadUser();
@@ -63,9 +104,14 @@ export function saveUser(u: StaffUser | null) {
   if (typeof window === "undefined") return;
   if (u) {
     localStorage.setItem(USER_KEY, JSON.stringify(u));
-    syncApplicationToBackend(u, loadOnb()).catch(() => null);
+    // Clear old onboarding and payment data when starting with a user so they start fresh
+    localStorage.removeItem(ONB_KEY);
+    window.dispatchEvent(new Event("staffhub:onb"));
+    syncApplicationToBackend(u, {}).catch(() => null);
   } else {
     localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(ONB_KEY);
+    window.dispatchEvent(new Event("staffhub:onb"));
   }
   window.dispatchEvent(new Event("staffhub:user"));
 }
