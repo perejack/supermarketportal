@@ -53,11 +53,13 @@ export async function POST(req: Request) {
     });
 
     if (error) {
+      console.error("[uploads/onboarding] Supabase storage error:", error.message, error);
       return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true, path });
   } catch (e: any) {
+    console.error("[uploads/onboarding] Unexpected error:", e?.message, e);
     return NextResponse.json({ ok: false, error: e?.message || "Upload failed" }, { status: 500 });
   }
 }

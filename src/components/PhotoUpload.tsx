@@ -61,6 +61,7 @@ export function PhotoUpload({
         className="hidden"
         onChange={async (e) => {
           const f = e.target.files?.[0];
+          const input = e.currentTarget; // capture before any await — React nullifies currentTarget after the tick
           if (!f) return;
           try {
             if (onSelectFile) await onSelectFile(f);
@@ -70,7 +71,7 @@ export function PhotoUpload({
               window.alert("This image could not be saved on this device. Please use a smaller or clearer photo and try again.");
             }
           } finally {
-            e.currentTarget.value = "";
+            if (input) input.value = "";
           }
         }}
       />

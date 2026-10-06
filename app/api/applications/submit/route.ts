@@ -142,11 +142,13 @@ export async function POST(req: Request) {
       .single();
 
     if (error) {
+      console.error("[applications/submit] Supabase upsert error:", error.message, error);
       return NextResponse.json({ ok: false, error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true, applicationId: data.id, createdAt: data.created_at });
   } catch (e: any) {
+    console.error("[applications/submit] Unexpected error:", e?.message, e);
     return NextResponse.json({ ok: false, error: e?.message || "Server error" }, { status: 500 });
   }
 }
